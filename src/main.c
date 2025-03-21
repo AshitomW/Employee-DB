@@ -4,42 +4,67 @@
 
 
 
-void printInstructions(char *argv[]){
-    printf("Usage: %s -n -f <database file>\n",argv[0]);
-    printf("-n : create new database file \n");
-    printf("-f : path to the database file (required)\n");
+
+struct option long_options []={
+    {"help",no_argument,0,'h'},
+    {"newfile",no_argument,0,'n'},
+
+    {"filepath",required_argument,0,'f'},
+    {0,0,0,0}
+};
+
+
+void printUsageInstructions(char *argv[]){
+    printf("Usage : %s --file=<DB-FilePath> [-n]\n",argv[0]);
+    printf("\t -f , --filename \tSpecify the input filepath (required)\n");
+    printf("\t -n , --newfile \tIndicates A New File");
 }
 
 
 
 int main(int argc, char *argv[])
 {
-    char *filepath = NULL;
-    bool newFile = false;
-    int commands;
-    while((commands = getopt(argc,argv,"nf:")) != -1){
+    
+    
+    int opts;
+    int option_index = 0;
 
-        switch(commands){
-            case 'n':
-               newFile = true;
-               break;
-            case 'f':
-                filepath = optarg;
-                break;
-            case '?':
-                printf("Unknown Option -%c\n",commands);
-                break;
-            default:
+
+    bool isNewFile = false;
+    char *filepath = NULL;
+    
+    while((opts = getopt_long(argc,argv,"hnf:",long_options,&option_index)) != -1){
+    
+        switch(opts){
+        case 'h':
+        printUsageInstructions(argv);
+        break;
+        case 'n':
+            isNewFile = true;
+            break;
+         case 'f':
+            filepath = optarg;
+            break;
+         case '?':
+            break;
+    
+         default: 
                 return -1;
+
         }
 
     }
 
     if(filepath == NULL){
-        printf("Filepath is a required argument!\n");
-        printInstructions(argv);
+        printf("Should Provide A FileName !\n");
+        printUsageInstructions(argv);
+        
     }
 
+    printf("filepath : %s\n",filepath);
+    printf("New File: %d\n",isNewFile);
+
+    
     return 0;
 
 }
