@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
         switch(opts){
         case 'h':
         printUsageInstructions(argv);
+        return 0;
         break;
         case 'n':
             isNewFile = true;
