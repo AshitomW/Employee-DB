@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <getopt.h>
+#include <stdlib.h>
 
 
 #include "common.h"
@@ -10,7 +11,7 @@
 struct option long_options []={
     {"help",no_argument,0,'h'},
     {"newfile",no_argument,0,'n'},
-
+    {"add",optional_argument,0,'a'},
     {"filepath",required_argument,0,'f'},
     {0,0,0,0}
 };
@@ -34,14 +35,16 @@ int main(int argc, char *argv[])
 
     bool isNewFile = false;
     char *filepath = NULL;
+    char *addString = NULL;
    
 
     int database_fd = -1;
     struct dbheader_t* dbheader = NULL; 
+    struct employee_t* employees = NULL;
 
 
 
-    while((opts = getopt_long(argc,argv,"hnf:",long_options,&option_index)) != -1){
+    while((opts = getopt_long(argc,argv,"hnf:a:",long_options,&option_index)) != -1){
     
         switch(opts){
         case 'h':
@@ -53,6 +56,9 @@ int main(int argc, char *argv[])
             break;
          case 'f':
             filepath = optarg;
+            break;
+        case 'a':
+            addString = optarg;
             break;
          case '?':
             break;
@@ -104,11 +110,20 @@ int main(int argc, char *argv[])
 
 
 
-
-    if(output_file(database_fd, dbheader) == STATUS_ERROR){
-        printf("Failed To Write To The Disk!");
+    if(read_employees(database_fd, dbheader,&employees) != STATUS_SUCCESS){
+        printf("Failed To Read Employees Data !");
         return -1;
-    };
+    }
+    if(addString){
+        dbheader->count++;
+        if(realloc(employees, dbheader->count * sizeof(struct employee_t)) == NULL){
+            return -1;
+        } ;
+        add_employee(dbheader,employees,addString);
+
+    }
+    output_file(database_fd, dbheader,employees);
+      
 
 
     return 0;
