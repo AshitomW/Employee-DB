@@ -13,6 +13,7 @@ struct option long_options []={
     {"newfile",no_argument,0,'n'},
     {"add",optional_argument,0,'a'},
     {"filepath",required_argument,0,'f'},
+    {"list",optional_argument,0,'l'},
     {0,0,0,0}
 };
 
@@ -34,6 +35,7 @@ int main(int argc, char *argv[])
 
 
     bool isNewFile = false;
+    bool list = false;
     char *filepath = NULL;
     char *addString = NULL;
    
@@ -44,7 +46,7 @@ int main(int argc, char *argv[])
 
 
 
-    while((opts = getopt_long(argc,argv,"hnf:a:",long_options,&option_index)) != -1){
+    while((opts = getopt_long(argc,argv,"hnf:a:l",long_options,&option_index)) != -1){
     
         switch(opts){
         case 'h':
@@ -60,6 +62,10 @@ int main(int argc, char *argv[])
         case 'a':
             addString = optarg;
             break;
+        case 'l':
+            list = true;
+            break;
+
          case '?':
             break;
     
@@ -114,6 +120,10 @@ int main(int argc, char *argv[])
         printf("Failed To Read Employees Data !");
         return -1;
     }
+
+
+
+
     if(addString){
         dbheader->count++;
         if(realloc(employees, dbheader->count * sizeof(struct employee_t)) == NULL){
@@ -121,6 +131,8 @@ int main(int argc, char *argv[])
         } ;
         add_employee(dbheader,employees,addString);
 
+    }    if(list){
+        list_employees(dbheader,employees);
     }
     output_file(database_fd, dbheader,employees);
       

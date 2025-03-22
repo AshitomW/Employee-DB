@@ -70,6 +70,17 @@ int create_database_header(int fd,struct dbheader_t** headerOut){
 }
 
 
+void list_employees(struct dbheader_t * dbheader, struct employee_t * employees){
+    int i=0;
+    for(;i<dbheader->count;i++){
+        printf("Employee %d\n",i);
+        printf("\tName:%s\n",employees[i].name);
+        printf("\tAddress:%s\n",employees[i].address);
+        printf("\tHours:%u\n",employees[i].hours);
+    }
+}
+
+
 int validate_database_header(int fd,struct dbheader_t** headerOut){
     if(fd < 0){
         printf("Bad file descriptor");
