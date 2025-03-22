@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "file.h"
+#include "parser.h"
 
 struct option long_options []={
     {"help",no_argument,0,'h'},
@@ -36,6 +37,9 @@ int main(int argc, char *argv[])
    
 
     int database_fd = -1;
+    struct dbheader_t* dbheader = NULL; 
+
+
 
     while((opts = getopt_long(argc,argv,"hnf:",long_options,&option_index)) != -1){
     
@@ -80,14 +84,31 @@ int main(int argc, char *argv[])
             printf("Unable To Create Database File\n");
             return -1;
         }
+
+      if(  create_database_header(database_fd,&dbheader)  == STATUS_ERROR){
+            printf("Failed To Create Database Header !\n");
+            return -1;
+        }
+
     }else{
         database_fd = load_database_file(filepath);
         if(database_fd == STATUS_ERROR){
             printf("Unable To Load Database File\n");
             return -1;
         }
+        if(validate_database_header(database_fd,&dbheader) == STATUS_ERROR){
+            printf("Failed To Validate Database Header\n");
+            return -1;
+        }
     }
 
+
+
+
+    if(output_file(database_fd, dbheader) == STATUS_ERROR){
+        printf("Failed To Write To The Disk!");
+        return -1;
+    };
 
 
     return 0;
